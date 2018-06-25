@@ -1,10 +1,9 @@
-
-######################################## Compiler #################################################
+default_make_option.mak
+######################################## Compilor #################################################
+# variables
 CC:=gcc
-CFLAGS:=-Wall -Wformat -Wparentheses -Wswitch-default -Wunused -O1 --coverage
-CPPFLAGS:=
-RM-F:=rm -fv
-AR:=ar crv
+CFLAGS:=-Wall -O3
+RM-F:=rm -f
+AR:=ar cr
 
 ####################################### THE END ###################################################
-
