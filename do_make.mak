@@ -81,6 +81,8 @@ ifneq ($(SORT_EN),0)
 SOURCES:=$(sort $(SOURCES))
 endif
 
+NOT_EXIST_FILES:=$(strip $(foreach file, $(SOURCES), $(shell if ! [ -f $(file) ]; then echo $(file); fi)))
+
 ########################################## CODE ROOT ##############################################
 SOURCE_PATH:=$(sort $(patsubst %/, %, $(dir $(SOURCES))))
 SOURCE_PATH_NUM:=$(words $(SOURCE_PATH))
@@ -236,6 +238,8 @@ test :
 	@echo
 	@echo "SOURCE_PATH2=$(SOURCE_PATH2)"
 	@echo
+	@echo "NOT_EXIST_FILES=$(NOT_EXIST_FILES)"
+	@echo
 #	@echo "OBJECTS=$(OBJECTS)"
 #	@echo
 #	@echo "DEPENDS=$(DEPENDS)"
@@ -276,6 +280,7 @@ $(RM) -f $@.$$$$;
 endef
 
 $(DEPENDS) : $(DEPEND_PATH)/%.d : $(CODE_ROOT)/%.c
+	@if [ -n "$(NOT_EXIST_FILES)" ]; then echo "NOT_EXIST_FILES=$(NOT_EXIST_FILES)"; exit 5; fi
 	@echo ---- $(@F) ----
 	@ if ! [ -d $(DEPEND_PATH)/$(*D) ]; then mkdir -p $(DEPEND_PATH)/$(*D); fi
 	@ $(create_depend)
@@ -284,6 +289,7 @@ $(DEPENDS) : $(DEPEND_PATH)/%.d : $(CODE_ROOT)/%.c
 
 ######################################## OBJECT RULES #############################################
 $(OBJECTS) : $(OBJECT_PATH)/%.o : $(CODE_ROOT)/%.c
+	@if [ -n "$(NOT_EXIST_FILES)" ]; then echo "NOT_EXIST_FILES=$(NOT_EXIST_FILES)"; exit 5; fi
 	@echo ---- $(@F) ----
 	@ if ! [ -d $(OBJECT_PATH)/$(*D) ]; then mkdir -p $(OBJECT_PATH)/$(*D); fi
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(D_MACRO) $(INCLUDES)   -c $<   -o $@ 
