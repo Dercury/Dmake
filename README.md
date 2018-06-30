@@ -78,9 +78,13 @@ configure.sh需要完成的工作包括：
 具体来说，main.exe静态链接handle.a，handle.a通过dlopen动态加载share.so，share.so又静态链接real.o。
 
 各个二进制文件和编译生成它们需要的源文件的对应关系如下：
+
 main.exe     test/executable/main.c        test/executable/main.h 
+
 handle.a     test/static_lib/handle.c      test/static_lib/handle.h 
+
 share.so     test/dynamic_lib/share.c      test/dynamic_lib/share.h 
+
 real.o       test/static_lib/real.c        test/static_lib/real.h
 
 
