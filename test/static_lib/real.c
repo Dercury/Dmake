@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  handle.h
+ *       Filename:  real.c
  *
- *    Description:  静态库，内部动态加载动态库
+ *    Description:  计算
  *
  *        Version:  1.0
- *        Created:  2018年06月30日 23时16分29秒
+ *        Created:  2018年06月30日 22时49分21秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,11 +16,14 @@
  * =====================================================================================
  */
 
-#ifndef __HANDLE_H__
-#define __HANDLE_H__
+int add(int a, int b)
+{
+    return a + b;
+}
 
-int handle(int a, int b, int flag);
-
-#endif /* __HANDLE_H__ */
+int sub(int a, int b)
+{
+    return a - b;
+}
 
 
