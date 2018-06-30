@@ -22,6 +22,21 @@ else
     make $MAKE_TYPE -f $MAKEFILE -j8  2>&1 | tee -a $LOGFILE
 fi
 
+# 判断是否有编译错误
+MAKE_ERROR_NUM=`grep ' error:' ${LOGFILE} | wc -l`
+if (($MAKE_ERROR_NUM));then
+    echo
+    echo "++++++++++++++++++++ [$MAKE_ERROR_NUM] ERROR(S) OCCURED +++++++++++++++++++++++"
+    grep ' error:' ${LOGFILE}
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo
+    exit $MAKE_ERROR_NUM
+fi
+
+if ! (($KEEP_MAKE_LOG)); then
+    rm -f ${LOGFILE}
+fi
+
 # 调用额外配置脚本
 if [ -n "$EXT_MAKE_SH" ]; then
     echo "Execute $BUILD_PATH/$EXT_MAKE_SH ...... start"

@@ -3,7 +3,7 @@
 # CODE_ROOT: 代码根目录
 # SRC_PATH: 源文件路径列表
 # SRC_FILE: 源文件列表
-# INCLUDE_PATH: 头文件路径，不需要带"-I"    TODO: 考虑带"-I"的保护
+# INCLUDE_PATH: 头文件路径，不需要带"-I"，已考虑带"-I"的保护
 # INSTALL_PATH: 安装目录
 # BUILD_TYPE: DEBUG或其他
 
@@ -11,7 +11,7 @@
 # CFLAGS: C编译器选项
 # CPPFLAGS: C预处理器选项
 # DEPFLAGS: .d文件编译选项
-# MACROS: 编译宏，不需要带"-D"    TODO: 考虑带"-D"的保护
+# MACROS: 编译宏，不需要带"-D"，已考虑带"-D"的保护
 
 # LD: 链接器
 # LDFLAGS: 链接器选项
@@ -33,14 +33,14 @@ TARGET_PATH=$(OUTPUT_PATH)/lib
 TARGET_TYPE:=STATIC_LIB
 endif
 
+ifeq ($(TARGET_SUFFIX),.a)
+TARGET_PATH=$(OUTPUT_PATH)/lib
+TARGET_TYPE:=STATIC_LIB
+endif
+
 ifeq ($(TARGET_SUFFIX),.so)
 TARGET_PATH=$(OUTPUT_PATH)/lib
 TARGET_TYPE:=DYNAMIC_LIB
-endif
-
-ifeq ($(TARGET_SUFFIX),.o)
-TARGET_PATH=$(OUTPUT_PATH)/lib
-TARGET_TYPE:=STATIC_LIB
 endif
 
 ifeq ($(TARGET_SUFFIX),.exe)
@@ -63,7 +63,7 @@ endif
 #HEADERS:=$(shell find $(INCLUDE_PATH) -maxdepth 1 -name "*.h")
 
 # include path used for compiler
-INCLUDES:=$(foreach dir, $(INCLUDE_PATH), $(addprefix -I, $(dir)))
+INCLUDES:=$(foreach dir, $(patsubst -I%, %, $(INCLUDE_PATH)), $(addprefix -I, $(dir)))
 
 ######################################## Source Files #############################################
 # .c files
@@ -80,6 +80,8 @@ endif
 ifneq ($(SORT_EN),0)
 SOURCES:=$(sort $(SOURCES))
 endif
+
+NOT_EXIST_FILES:=$(strip $(foreach file, $(SOURCES), $(shell if ! [ -f $(file) ]; then echo $(file); fi)))
 
 ########################################## CODE ROOT ##############################################
 SOURCE_PATH:=$(sort $(patsubst %/, %, $(dir $(SOURCES))))
@@ -130,9 +132,9 @@ ifeq ($(DEPFLAGS),)
 DEPFLAGS:=-MM
 endif
 
-D_MACRO:=$(foreach macro, $(MACROS), $(addprefix -D, $(macro)))
-L_LIB:=$(foreach lib, $(dir $(LIBS)), $(addprefix -L, $(lib)))
-L_LIB+=$(foreach lib, $(LIBS), $(addprefix -l, $(lib)))
+D_MACRO:=$(foreach macro, $(patsubst -D%, %, $(MACROS)), $(addprefix -D, $(macro)))
+L_LIB:=$(foreach lib, $(patsubst %/, %, $(dir $(LIBS))), $(addprefix -L, $(lib)))
+L_LIB+=$(foreach lib, $(patsubst lib%, %, $(notdir $(basename $(LIBS)))), $(addprefix -l, $(lib)))
 
 ######################################## TARGETS ##################################################
 .PHONY: all deps objs clean veryclean rebuild install uninstall run test
@@ -236,6 +238,8 @@ test :
 	@echo
 	@echo "SOURCE_PATH2=$(SOURCE_PATH2)"
 	@echo
+	@echo "NOT_EXIST_FILES=$(NOT_EXIST_FILES)"
+	@echo
 #	@echo "OBJECTS=$(OBJECTS)"
 #	@echo
 #	@echo "DEPENDS=$(DEPENDS)"
@@ -247,10 +251,12 @@ test :
 #	@echo "MACROS=$(MACROS)"
 #	@echo
 #	@echo "D_MACRO=$(D_MACRO)"
-#	@echo
-#	@echo "LIBS=$(LIBS)"
-#	@echo
-#	@echo "L_LIB=$(L_LIB)"
+	@echo
+	@echo "LIBS=$(LIBS)"
+	@echo
+	@echo "L_LIB=$(L_LIB)"
+	@echo
+	@echo "INSTALL_PATH=$(INSTALL_PATH)"
 
 ######################################## DEPEND RULES #############################################
 # -: omit result
@@ -276,6 +282,7 @@ $(RM) -f $@.$$$$;
 endef
 
 $(DEPENDS) : $(DEPEND_PATH)/%.d : $(CODE_ROOT)/%.c
+	@if [ -n "$(NOT_EXIST_FILES)" ]; then echo "NOT_EXIST_FILES=$(NOT_EXIST_FILES)"; exit 5; fi
 	@echo ---- $(@F) ----
 	@ if ! [ -d $(DEPEND_PATH)/$(*D) ]; then mkdir -p $(DEPEND_PATH)/$(*D); fi
 	@ $(create_depend)
@@ -284,6 +291,7 @@ $(DEPENDS) : $(DEPEND_PATH)/%.d : $(CODE_ROOT)/%.c
 
 ######################################## OBJECT RULES #############################################
 $(OBJECTS) : $(OBJECT_PATH)/%.o : $(CODE_ROOT)/%.c
+	@if [ -n "$(NOT_EXIST_FILES)" ]; then echo "NOT_EXIST_FILES=$(NOT_EXIST_FILES)"; exit 5; fi
 	@echo ---- $(@F) ----
 	@ if ! [ -d $(OBJECT_PATH)/$(*D) ]; then mkdir -p $(OBJECT_PATH)/$(*D); fi
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(D_MACRO) $(INCLUDES)   -c $<   -o $@ 
@@ -300,12 +308,13 @@ $(TARGET) : $(OBJECTS)
 				then $(AR) $(ARFLAGS) $@ $^; \
 			else \
 				$(LD) $(LDFLAGS) $^ -o $@; \
-			fi \
+			fi; \
+			echo build Static Lib success!; \
 	elif [ $(TARGET_TYPE) == DYNAMIC_LIB ]; \
-		then $(CC) $(CPPFLAGS) -shared -fPIC $(CFLAGS) $(D_MACRO) $(INCLUDES)    $^    $(LIBS)   -o $@; \
-		echo build Executable success!; \
+		then $(CC) $(CPPFLAGS) -shared -fPIC $(CFLAGS) $(D_MACRO) $(INCLUDES)    $^    $(L_LIB)   -o $@; \
+		echo build Dynamic Lib success!; \
 	elif [ $(TARGET_TYPE) == EXECUTABLE ]; \
-		then $(CC) $(CPPFLAGS) $(CFLAGS) $(D_MACRO) $(INCLUDES)    $^    $(LIBS)   -o $@; \
+		then $(CC) $(CPPFLAGS) $(CFLAGS) $(D_MACRO) $(INCLUDES)    $^    $(L_LIB)   -o $@; \
 		echo build Executable success!; \
 	else \
 		echo ERROR: unkown target type!; \

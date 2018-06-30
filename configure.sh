@@ -70,12 +70,14 @@ echo
 # 检查是否缺少必须输入项
 # 补齐缺少的可选输入项
 # 生成Makefile
-export DATE_STR=`date +%F_%H-%M-%S`
+DATE_STR=`date +%F_%H-%M-%S`
+MAKE_FILENAME=${TARGET##*/}
+MAKE_FILENAME=${MAKE_FILENAME%%.*}_$MAKE_TYPE
 
-export LOGFILE="$BUILD_PATH/MakeLog_$DATE_STR.log"
+export LOGFILE="$BUILD_PATH/MakeLog_${MAKE_FILENAME}_$DATE_STR.log"
 echo LOGFILE=$LOGFILE
 
-export MAKEFILE="$BUILD_PATH/Makefile_$DATE_STR"
+export MAKEFILE="$BUILD_PATH/Makefile_${MAKE_FILENAME}_$DATE_STR"
 echo MAKEFILE=$MAKEFILE
 
 if [ -n "$ALL_CONFIG_MAK" ]; then
