@@ -72,7 +72,9 @@ configure.sh需要完成的工作包括：
 
 该工程使用dmake脚本编译生成了2个静态库（handle.a，real.o），1个动态库（share.so）和1个可执行文件（main.exe）。
 这些二进制文件之间的依赖关系如下：
+
     main.exe => handle.a => share.so => real.o
+
 具体来说，main.exe静态链接handle.a，handle.a通过dlopen动态加载share.so，share.so又静态链接real.o。
 
 各个二进制文件和编译生成它们需要的源文件的对应关系如下：
