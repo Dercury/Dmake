@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     int a = 5;
     int b = 7;
     int flag = 2;
-
+#if 0
     if (argc > 0)
     {
         a = atoi(argv[0]);
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     {
         flag = atoi(argv[2]);
     }
-
+#endif
     printf("\r\n result = %d \r\n", handle(a, b, flag));
 
     return 0;

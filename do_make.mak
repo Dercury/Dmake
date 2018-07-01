@@ -328,7 +328,7 @@ $(TARGET) : $(OBJECTS)
 			fi; \
 			echo build Static Lib success!; \
 	elif [ $(TARGET_TYPE) == DYNAMIC_LIB ]; \
-		then $(CC) $(CPPFLAGS) -shared -fPIC $(CFLAGS) $(D_MACRO) $(INCLUDES)    $^    $(L_LIB)   -o $@; \
+		then $(CC) $(CPPFLAGS) -shared -fPIC $(CFLAGS) $(D_MACRO) $(INCLUDES)    $^    $(LIBS)   -o $@; \
 		echo build Dynamic Lib success!; \
 	elif [ $(TARGET_TYPE) == EXECUTABLE ]; \
 		then $(CC) $(CPPFLAGS) $(CFLAGS) $(D_MACRO) $(INCLUDES)    $^    $(LIBS)   -o $@; \
