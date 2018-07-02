@@ -16,28 +16,31 @@
  * =====================================================================================
  */
 
-#include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <dlfcn.h>
 
 int handle(int a, int b, int flag)
 {
     int ret;
     char *error;
     int (*hfn)(int, int, int);
-    void* hso = dlopen("./share.so", RTLD_LAZY);
+    void* hso = NULL;
+
+    printf("%s %d: start dlopen\n", __FILE__, __LINE__);
+
+    hso = dlopen("./share.so", RTLD_LAZY);
     if (!hso)
     {
-        fprintf(stderr, "%s\n", dlerror());
+        printf("dlopen: %s\n", dlerror());
         exit(1);
     }
 
     hfn = dlsym(hso, "calc");
     if ((error = dlerror()) != NULL)
     {
-        fprintf(stderr, "%s\n", error);
+        printf("dlsym: %s\n", error);
         exit(2);
     }
 
@@ -45,11 +48,12 @@ int handle(int a, int b, int flag)
 
     if (dlclose(hso) < 0)
     {
-        fprintf(stderr, "%s\n", dlerror());
+        printf("dlclose: %s\n", dlerror());
         exit(3);
     }
 
+    printf("%s %d: end dlopen\n", __FILE__, __LINE__);
+
     return ret;
 }
-
 
