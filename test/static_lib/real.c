@@ -18,12 +18,13 @@
 
 int add(int a, int b)
 {
+    printf("\r\n%s(%d, %d)\r\n", __func__, a, b);
     return a + b;
 }
 
 int sub(int a, int b)
 {
+    printf("\r\n%s(%d, %d)\r\n", __func__, a, b);
     return a - b;
 }
-
 
