@@ -36,7 +36,16 @@ CC:=$(strip $(CC))
 CFLAGS:=$(strip $(CFLAGS))
 CPPFLAGS:=$(strip $(CPPFLAGS))
 
+LD:=$(strip $(LD))
+LDFLAGS:=$(strip $(LDFLAGS))
+
+AR:=$(strip $(AR))
+ARFLAGS:=$(strip $(ARFLAGS))
+AREN:=$(strip $(AREN))
+
 LIBS:=$(strip $(LIBS))
+
+RM:=$(strip $(RM))
 
 ######################################## Target ###################################################
 OUTPUT_PATH:=$(PWD)/output
@@ -149,9 +158,9 @@ endif
 
 D_MACRO:=$(foreach macro, $(patsubst -D%, %, $(MACROS)), $(addprefix -D, $(macro)))
 
-L_LIB:=$(foreach lib, $(patsubst %/, %, $(dir $(LIBS))), $(addprefix -L, $(lib)))
-L_LIB+=$(foreach lib, $(patsubst lib%, %, $(notdir $(basename $(LIBS)))), $(addprefix -l, $(lib)))
-L_LIB+=$(foreach lib, $(patsubst -l%, %, $(LIBS)), $(addprefix -l, $(lib)))
+#L_LIB:=$(foreach lib, $(patsubst %/, %, $(dir $(LIBS))), $(addprefix -L, $(lib)))
+#L_LIB+=$(foreach lib, $(patsubst lib%, %, $(notdir $(basename $(LIBS)))), $(addprefix -l, $(lib)))
+#L_LIB+=$(foreach lib, $(patsubst -l%, %, $(LIBS)), $(addprefix -l, $(lib)))
 
 ######################################## TARGETS ##################################################
 .PHONY: all deps objs clean veryclean rebuild install uninstall run test
@@ -270,8 +279,8 @@ test :
 	@echo "D_MACRO=$(D_MACRO)"
 	@echo
 	@echo "LIBS=$(LIBS)"
-	@echo
-	@echo "L_LIB=$(L_LIB)"
+#	@echo
+#	@echo "L_LIB=$(L_LIB)"
 	@echo
 	@echo "INSTALL_PATH=$(INSTALL_PATH)"
 
@@ -322,13 +331,13 @@ $(TARGET) : $(OBJECTS)
 	 if [ $(TARGET_TYPE) == STATIC_LIB ]; \
 		then \
 			if [ $(AREN) -ne 0 ]; \
-				then $(AR) $(ARFLAGS) $@ $^; \
+				then $(AR) $(ARFLAGS) $@ $^ $(LIBS); \
 			else \
-				$(LD) $(LDFLAGS) $^ $(L_LIB) -o $@; \
+				$(LD) $(LDFLAGS) $^ $(LIBS) -o $@; \
 			fi; \
 			echo build Static Lib success!; \
 	elif [ $(TARGET_TYPE) == DYNAMIC_LIB ]; \
-		then $(CC) $(CPPFLAGS) -shared -fPIC $(CFLAGS) $(D_MACRO) $(INCLUDES)    $^    $(LIBS)   -o $@; \
+		then $(CC) $(SHAREFLAGS) $(CPPFLAGS) $(CFLAGS) $(D_MACRO) $(INCLUDES)    $^    $(LIBS)   -o $@; \
 		echo build Dynamic Lib success!; \
 	elif [ $(TARGET_TYPE) == EXECUTABLE ]; \
 		then $(CC) $(CPPFLAGS) $(CFLAGS) $(D_MACRO) $(INCLUDES)    $^    $(LIBS)   -o $@; \
