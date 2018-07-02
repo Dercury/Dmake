@@ -26,25 +26,27 @@ int main(int argc, char **argv)
     int a = 5;
     int b = 7;
     int flag = 2;
-#if 0
-    if (argc > 0)
-    {
-        a = atoi(argv[0]);
-    }
+    int result = 0;
 
     if (argc > 1)
     {
-        b = atoi(argv[1]);
+        a = atoi(argv[1]);
     }
 
     if (argc > 2)
     {
-        flag = atoi(argv[2]);
+        b = atoi(argv[2]);
     }
-#endif
-    printf("\r\n result = %d \r\n", handle(a, b, flag));
+
+    if (argc > 3)
+    {
+        flag = atoi(argv[3]);
+    }
+
+    printf("\r\n a=%d, b=%d, flag=%d\r\n", a, b, flag);
+    result = handle(a, b, flag);
+    printf("\r\n result = %d \r\n", result);
 
     return 0;
 }
-
 
