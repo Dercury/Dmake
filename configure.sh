@@ -80,6 +80,9 @@ echo LOGFILE=$LOGFILE
 export MAKEFILE="$BUILD_PATH/Makefile_${MAKE_FILENAME}_$DATE_STR"
 echo MAKEFILE=$MAKEFILE
 
+export HEADER_LIST="$BUILD_PATH/HeaderList_${MAKE_FILENAME}.txt"
+echo HEADER_LIST=$HEADER_LIST
+
 if [ -n "$ALL_CONFIG_MAK" ]; then
     # 使用统一mak脚本
     echo "include $ALL_CONFIG_MAK" >> $MAKEFILE
