@@ -33,6 +33,10 @@ if (($MAKE_ERROR_NUM));then
     exit $MAKE_ERROR_NUM
 fi
 
+if [[ $MAKE_TYPE != "clean" && $MAKE_TYPE != "veryclean" && $MAKE_TYPE != "uninstall" ]]; then
+    find ./output/depend/ -name '*.d' -exec grep ' *\.h' {} \; | sed 's/ \\//' | sort | uniq > $HEADER_LIST
+fi
+
 if ! (($KEEP_MAKE_LOG)); then
     rm -f ${LOGFILE}
 fi
