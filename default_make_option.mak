@@ -2,7 +2,7 @@
 # C语言编译程序
 CC:=gcc
 # C语言编译器参数
-CFLAGS:=-Wall -O3 -fPIC -g
+CFLAGS:=-rdynamic -Wall -O3 -fPIC -g
 
 # C预处理器
 CPP:=$(CC) -E
